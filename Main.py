@@ -26,12 +26,12 @@ if not firebase_admin._apps:
     #     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     #     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/" + client_email
     # }
-    # additional_claims = {
-    #     "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # 유효 시간 설정
-    # }
+    additional_claims = {
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # 유효 시간 설정
+    }
 
-    # user = auth.get_user_by_email("user@example.com")
-    # custom_token = auth.create_custom_token(user.uid, additional_claims)
+    user = firebase_admin.auth.get_user_by_email("user@example.com")
+    custom_token = firebase_admin.auth.create_custom_token(user.uid, additional_claims)
     
     # Firebase 초기화
     cred = credentials.Certificate(st.secrets["firebase"])
