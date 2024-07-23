@@ -19,7 +19,9 @@ def create_custom_token(email):
     }
     try:
         user = auth.get_user_by_email(email)
+        st.write(f"User UID: {user.uid}")  # 디버깅 정보 출력
         custom_token = auth.create_custom_token(user.uid, additional_claims)
+        st.write(f"Custom Token: {custom_token.decode()}")  # 디버깅 정보 출력
         return custom_token
     except Exception as e:
         st.error(f"Error creating custom token: {e}")
