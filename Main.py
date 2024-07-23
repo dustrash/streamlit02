@@ -4,31 +4,31 @@ from firebase_admin import credentials, auth, db
 import datetime
 
 # Firebase 초기화
+import streamlit as st
+import firebase_admin
+from firebase_admin import credentials, auth
+
 if not firebase_admin._apps:
-    # Firebase 서비스 계정 정보로부터 초기화
-    cred = credentials.Certificate(st.secrets["firebase"])
+    # Firebase 서비스 계정 정보로 초기화
+    cred = credentials.Certificate({
+        "type": st.secrets["firebase"]["type"],
+        "project_id": st.secrets["firebase"]["project_id"],
+        "private_key_id": st.secrets["firebase"]["private_key_id"],
+        "private_key": st.secrets["firebase"]["private_key"].replace('\\n', '\n'),
+        "client_email": st.secrets["firebase"]["client_email"],
+        "client_id": st.secrets["firebase"]["client_id"],
+        "auth_uri": st.secrets["firebase"]["auth_uri"],
+        "token_uri": st.secrets["firebase"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["firebase"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["firebase"]["client_x509_cert_url"]
+    })
     firebase_admin.initialize_app(cred)
+
 
 # 데이터베이스 참조
 ref = db.reference("/users")
 
 # 사용자 인증 및 커스텀 토큰 생성
-def create_custom_token(email):
-    additional_claims = {
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # 유효 시간 설정
-    }
-    try:
-        user = auth.get_user_by_email(email)
-        st.write(f"User UID: {user.uid}")  # 디버깅 정보 출력
-        custom_token = auth.create_custom_token(user.uid, additional_claims)
-        st.write(f"Custom Token: {custom_token.decode()}")  # 디버깅 정보 출력
-        return custom_token
-    except Exception as e:
-        st.error(f"Error creating custom token: {e}")
-        return None
-
-# 사용자 이메일을 통해 커스텀 토큰 생성 (예시: 'user@example.com'을 실제 사용자 이메일로 대체)
-custom_token = create_custom_token("firebase-adminsdk-arsle@teststreamlit-3fc73.iam.gserviceaccount.com")
 
 # 폼 입력
 with st.form("my_form"):
