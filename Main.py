@@ -3,32 +3,39 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 
+import datetime
+
+
 if not firebase_admin._apps:
-    # Firebase 서비스 계정 정보 읽기
-    private_key = st.secrets["firebase"]["private_key"]
-    client_email = st.secrets["firebase"]["client_email"]
-    project_id = st.secrets["firebase"]["project_id"]
-    database_url = st.secrets["firebase"]["database_url"]
+    # # Firebase 서비스 계정 정보 읽기
+    # private_key = st.secrets["firebase"]["private_key"]
+    # client_email = st.secrets["firebase"]["client_email"]
+    # project_id = st.secrets["firebase"]["project_id"]
+    # database_url = st.secrets["firebase"]["database_url"]
     
     # 서비스 계정 JSON 생성
-    service_account_info = {
-        "type": "service_account",
-        "project_id": project_id,
-        "private_key_id": "1e6da85c32825373145e1c142eece635aba8ef0b",  # 실제 값으로 대체 필요
-        "private_key": private_key,
-        "client_email": client_email,
-        "client_id": "115412658206097193951",  # 실제 값으로 대체 필요
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/" + client_email
+    # service_account_info = {
+    #     "type": "service_account",
+    #     "project_id": project_id,
+    #     "private_key_id": "1e6da85c32825373145e1c142eece635aba8ef0b",  # 실제 값으로 대체 필요
+    #     "private_key": private_key,
+    #     "client_email": client_email,
+    #     "client_id": "115412658206097193951",  # 실제 값으로 대체 필요
+    #     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    #     "token_uri": "https://oauth2.googleapis.com/token",
+    #     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    #     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/" + client_email
+    # }
+    additional_claims = {
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # 유효 시간 설정
     }
+
+    user = auth.get_user_by_email("user@example.com")
+    custom_token = auth.create_custom_token(user.uid, additional_claims)
     
     # Firebase 초기화
-    cred = credentials.Certificate(service_account_info)
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': database_url
-    })
+    cred = credentials.Certificate(st.secrets["firebase"])
+    firebase_admin.initialize_app(cred)
 
 ref = db.reference("/users")
 
